@@ -1,8 +1,9 @@
-const renderTable = (json:[]):void=>
+
+const renderTable = (json:[DataForm]):void=>
 {
   // columns to set in table and to use from api data
-  let cols:string[] = ["name","email","phone","website"];
-  let colsHTML:string = '<div class="header__item"><a id="#" class="filter__link" >#</a></div>';
+  let cols:string[] = ["id","name","email","phone","website"];
+  let colsHTML:string = '';
 
   cols.forEach((key,value) => {
     colsHTML += ' <div class="header__item"><a id="'+key+'" class="filter__link" >'+key.toUpperCase()+'</a></div>'; 
@@ -12,17 +13,13 @@ const renderTable = (json:[]):void=>
   
   // looping through each record
   for (let index = 0; index < json.length; index++) {
-    const element:[] = json[index];
+    const element:DataForm = json[index];
 
-    let trHTML:string = '<div class="table-row"><div class="table-data">'+(index+1)+'</div>';
-
-  // looping through each data field
-    for (const key in element) {
-      // only using cols defined on line:4
-      if (cols.includes(key) && Object.prototype.hasOwnProperty.call(element, key)) {
-      trHTML+='<div class="table-data">'+element[key]+'</div>';
-      }
-    }
+    let trHTML:string = '<div class="table-row"><div class="table-data">'+element.id+'</div>';
+    trHTML+='<div class="table-data">'+element.name+'</div>';
+    trHTML+='<div class="table-data">'+element.email+'</div>';
+    trHTML+='<div class="table-data">'+element.phone+'</div>';
+    trHTML+='<div class="table-data">'+element.website+'</div>';
 
     trHTML+='</div>';
     rowsHTML +=trHTML;
@@ -48,22 +45,38 @@ const renderError = (errorText:string):void=>
   console.log("Error",errorText);
 }
 
-
-//
-const xhttp = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
-  if (this.readyState == 4 ) {
-    if (this.status == 200) {
-
-    let json:[] = JSON.parse(this.responseText);
-    renderTable(json);
-
-  }else{
-    renderError(xhttp.statusText);
- }
-}
+interface DataForm  {
+  id:number,
+  name:string
+  email: string,
+  phone:number,
+  website:string
 };
 
+const main = async()=>
+{
 
-xhttp.open("GET", "https://jsonplaceholder.typicode.com/users", true);
-xhttp.send();
+  const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange =await function() {
+    if (this.readyState == 4 ) {
+      if (this.status == 200) {
+  
+      let json:[DataForm] = JSON.parse(this.responseText);
+
+      let sadam:DataForm ={id:11,name:"Saddam Umer",email:"sadamumer3@gmail.com",phone:923168552260,website:"sadamumer3.io"};
+      json.push(sadam);
+
+      renderTable(json);
+  
+    }else{
+      renderError(xhttp.statusText);
+   }
+  }
+  };
+  
+  
+  xhttp.open("GET", "https://jsonplaceholder.typicode.com/users", true);
+  xhttp.send();
+}
+
+main();
